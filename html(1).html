@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Flow · Biblioteca Digital</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background-color: #DBBC87;
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      color: #000000;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+    }
+
+    .app {
+      max-width: 1400px;
+      width: 100%;
+      position: relative;
+    }
+
+    /* ---------- PÁGINAS (view) ---------- */
+    .page {
+      display: none;
+      animation: fade 0.25s ease;
+    }
+    .page.active {
+      display: block;
+    }
+
+    @keyframes fade {
+      0% { opacity: 0.4; transform: translateY(8px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ---------- CABEÇALHO COM SETA E MENU HAMBÚRGUER ---------- */
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.5rem 0 1.2rem 0;
+      flex-wrap: wrap;
+      gap: 0.8rem;
+    }
+
+    .top-bar .logo {
+      font-weight: 800;
+      font-size: 1.6rem;
+      letter-spacing: -0.02em;
+      color: #000000;
+    }
+
+    .top-actions {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    /* botão hambúrguer (três barras) */
+    .hamburger {
+      background: #FFFFFF;
+      border: 1.8px solid #d4c2a6;
+      border-radius: 2.4rem;
+      padding: 0.55rem 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+      transition: 0.2s;
+      box-shadow: 0 4px 10px -6px rgba(0,0,0,0.1);
+    }
+    .hamburger:hover {
+      background: #f5f2ec;
+      border-color: #b8860b;
+      transform: scale(0.96);
+    }
+    .hamburger span {
+      display: block;
+      width: 26px;
+      height: 3px;
+      background: #000000;
+      border-radius: 6px;
+      transition: 0.2s;
+    }
+
+    /* seta voltar */
+    .back-arrow {
+      background: #FFFFFF;
+      border: 1.8px solid #d4c2a6;
+      border-radius: 3rem;
+      padding: 0.4rem 1rem 0.4rem 0.9rem;
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: #000000;
+      cursor: pointer;
+      transition: 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      line-height: 1;
+      box-shadow: 0 4px 10px -6px rgba(0,0,0,0.1);
+    }
+    .back-arrow:hover {
+      background: #f5f2ec;
+      border-color: #b8860b;
+      transform: scale(0.96);
+    }
+    .back-arrow span {
+      font-size: 1.1rem;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* ---------- PÁGINA INICIAL (HOME) ---------- */
+    .home-highlight {
+      background: rgba(255, 255, 240, 0.6);
+      padding: 1.2rem 1.8rem;
+      border-radius: 60px;
+      display: inline-block;
+      margin-bottom: 0.8rem;
+      font-weight: 700;
+      font-size: 1.1rem;
+    }
+
+    .book-grid {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 2rem;
+      margin-top: 1.2rem;
+    }
+
+    .book-card {
+      background: #FFFFFF;
+      border-radius: 2rem;
+      padding: 1.5rem 1.2rem 1.8rem;
+      max-width: 260px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 12px 22px -12px rgba(0, 0, 0, 0.15);
+      border: 1px solid rgba(0,0,0,0.08);
+      transition: 0.2s;
+    }
+    .book-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 20px 30px -12px rgba(0, 0, 0, 0.2);
+    }
+    .book-card .cover {
+      font-size: 3.8rem;
+      margin-bottom: 0.2rem;
+    }
+    .book-card h3 {
+      font-size: 1.3rem;
+      font-weight: 800;
+      margin: 0.3rem 0 0.1rem;
+    }
+    .book-card .author {
+      font-weight: 600;
+      color: #4d3b28;
+      font-size: 0.9rem;
+    }
+    .book-card .tag {
+      margin-top: 0.7rem;
+      background: #f2ede3;
+      padding: 0.2rem 1rem;
+      border-radius: 40px;
+      display: inline-block;
+      font-weight: 600;
+      font-size: 0.7rem;
+      letter-spacing: 0.4px;
+    }
+
+    /* ---------- PÁGINA MENU ---------- */
+    .menu-page .menu-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+      max-width: 400px;
+      margin: 2rem auto;
+    }
+    .menu-btn {
+      background: #FFFFFF;
+      border: 1.8px solid #d4c2a6;
+      padding: 1.2rem;
+      border-radius: 2.4rem;
+      font-weight: 700;
+      font-size: 1.3rem;
+      color: #000000;
+      cursor: pointer;
+      transition: 0.2s;
+      text-align: center;
+      box-shadow: 0 4px 10px -6px rgba(0,0,0,0.05);
+    }
+    .menu-btn:hover {
+      background: #faf7f0;
+      border-color: #b8860b;
+      transform: scale(0.98);
+    }
+
+    /* ---------- PÁGINAS CADASTRO / LOGIN ---------- */
+    .form-card {
+      background: #FFFFFF;
+      border-radius: 2rem;
+      max-width: 420px;
+      margin: 1.8rem auto;
+      padding: 1.8rem 2rem 2.2rem;
+      box-shadow: 0 16px 30px -14px rgba(0,0,0,0.15);
+      border: 1px solid rgba(0,0,0,0.06);
+    }
+    .form-card h2 {
+      font-size: 1.9rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 1.5rem;
+      border-bottom: 2px solid #f0e2cf;
+      padding-bottom: 0.6rem;
+    }
+    .input-group {
+      margin-bottom: 1.2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+    }
+    .input-group label {
+      font-weight: 700;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      color: #000000;
+    }
+    .input-group input {
+      padding: 0.9rem 1rem;
+      border: 1.5px solid #d4c2a6;
+      border-radius: 1.8rem;
+      font-family: 'Inter', monospace;
+      font-size: 1rem;
+      background: #FFFFFF;
+      transition: 0.2s;
+      outline: none;
+      color: #000000;
+      font-weight: 500;
+    }
+    .input-group input:focus {
+      border-color: #b8860b;
+      box-shadow: 0 0 0 3px rgba(184, 134, 11, 0.2);
+    }
+    .btn-primary {
+      background: #FFFFFF;
+      color: #000000;
+      border: 1.8px solid #d4c2a6;
+      width: 100%;
+      padding: 0.9rem;
+      font-weight: 700;
+      border-radius: 3rem;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: 0.2s;
+      margin-top: 0.4rem;
+    }
+    .btn-primary:hover {
+      background: #f5f2ec;
+      border-color: #b8860b;
+      transform: scale(0.98);
+    }
+    .toast-msg {
+      background: #FFFFFF;
+      color: #000000;
+      padding: 0.6rem 1rem;
+      border-radius: 40px;
+      text-align: center;
+      margin-top: 0.8rem;
+      font-weight: 600;
+      font-size: 0.8rem;
+      border: 1px solid #d4c2a6;
+      opacity: 0;
+      transition: opacity 0.2s;
+      pointer-events: none;
+    }
+    .toast-msg.show {
+      opacity: 1;
+    }
+
+    /* ---------- PÁGINA PRODUTO (após login) ---------- */
+    .produto-grid {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 2rem;
+      margin: 1.5rem 0;
+    }
+    .produto-item {
+      background: #FFFFFF;
+      border-radius: 2rem;
+      padding: 1.2rem 1.2rem 1.8rem;
+      max-width: 260px;
+      width: 100%;
+      border: 1px solid rgba(0,0,0,0.08);
+      box-shadow: 0 12px 22px -12px rgba(0,0,0,0.1);
+      transition: 0.2s;
+      text-align: center;
+    }
+    .produto-item:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 20px 30px -12px rgba(0,0,0,0.2);
+    }
+    .produto-item .icon {
+      font-size: 3.2rem;
+    }
+    .produto-item h4 {
+      font-size: 1.2rem;
+      font-weight: 800;
+      margin: 0.2rem 0 0.1rem;
+    }
+    .produto-item .autor {
+      font-weight: 600;
+      color: #4d3b28;
+      font-size: 0.8rem;
+    }
+    .produto-item .gratis {
+      margin: 0.6rem 0 0.4rem;
+      background: #f2ede3;
+      padding: 0.15rem 1rem;
+      border-radius: 40px;
+      display: inline-block;
+      font-weight: 700;
+      font-size: 0.8rem;
+    }
+    .btn-produto {
+      background: #FFFFFF;
+      border: 1.8px solid #d4c2a6;
+      border-radius: 2.4rem;
+      padding: 0.6rem;
+      font-weight: 700;
+      font-size: 0.9rem;
+      width: 100%;
+      cursor: pointer;
+      transition: 0.2s;
+      color: #000000;
+      margin-top: 0.3rem;
+    }
+    .btn-produto:hover {
+      background: #f5f2ec;
+      border-color: #b8860b;
+    }
+
+    .demo-note {
+      text-align: center;
+      margin-top: 2.2rem;
+      font-size: 0.7rem;
+      font-weight: 600;
+      background: rgba(255, 255, 235, 0.7);
+      padding: 0.3rem 1.2rem;
+      border-radius: 60px;
+      display: inline-block;
+      width: fit-content;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    /* responsivo */
+    @media (max-width: 700px) {
+      .book-grid { gap: 1.2rem; }
+      .book-card { max-width: 220px; }
+      .form-card { margin: 1rem 0.5rem; padding: 1.5rem; }
+    }
+    @media (max-width: 480px) {
+      .top-bar .logo { font-size: 1.2rem; }
+      .hamburger { padding: 0.4rem 0.8rem; }
+      .hamburger span { width: 20px; height: 2.5px; }
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ========== HOME ========== -->
+  <div id="pageHome" class="page active">
+    <div class="top-bar">
+      <div class="logo">📚 Flow · Biblioteca</div>
+      <div class="top-actions">
+        <div class="hamburger" id="hamburgerBtn">
+          <span></span><span></span><span></span>
+        </div>
+      </div>
+    </div>
+    <div class="home-highlight">✦ Página infinita — livros para todos os gostos ✦</div>
+    <div class="book-grid">
+      <div class="book-card"><div class="cover">🔥</div><h3>Jogos Vorazes</h3><div class="author">Suzanne Collins</div><div class="tag">Distopia</div></div>
+      <div class="book-card"><div class="cover">🧛</div><h3>Os Imortais</h3><div class="author">Alyson Noel</div><div class="tag">Fantasia</div></div>
+      <div class="book-card"><div class="cover">❤️</div><h3>A hipótese do amor</h3><div class="author">Ali Hazelwood</div><div class="tag">Romance</div></div>
+    </div>
+    <div style="margin-top: 1.8rem; font-size: 0.9rem; font-weight: 500; text-align: center;">📖 clique nas barras ⤴ para abrir o menu</div>
+    <div class="demo-note">fundo #DBBC87 · letras #000 · botões brancos</div>
+  </div>
+
+  <!-- ========== MENU ========== -->
+  <div id="pageMenu" class="page menu-page">
+    <div class="top-bar">
+      <div class="logo">📚 Menu</div>
+      <div class="top-actions">
+        <div class="back-arrow" id="backFromMenu"><span>←</span> Voltar</div>
+      </div>
+    </div>
+    <div class="menu-grid">
+      <div class="menu-btn" id="menuToLogin">🔑 LOGIN</div>
+      <div class="menu-btn" id="menuToCadastro">📝 CADASTRO</div>
+    </div>
+    <div style="text-align: center; margin-top: 1.5rem; font-weight: 500;">Escolha uma opção</div>
+  </div>
+
+  <!-- ========== CADASTRO ========== -->
+  <div id="pageCadastro" class="page">
+    <div class="top-bar">
+      <div class="logo">📝 Cadastro</div>
+      <div class="top-actions">
+        <div class="back-arrow" id="backFromCadastro"><span>←</span> Voltar</div>
+      </div>
+    </div>
+    <div class="form-card">
+      <h2>CADASTRO</h2>
+      <div class="input-group"><label>NOME COMPLETO</label><input type="text" id="cadNome" placeholder="Maria Vitória Alves"></div>
+      <div class="input-group"><label>EMAIL</label><input type="email" id="cadEmail" placeholder="leitor@biblioteca.com"></div>
+      <div class="input-group"><label>SENHA</label><input type="password" id="cadSenha" placeholder="••••••"></div>
+      <button class="btn-primary" id="btnCadastrar">CRIAR CONTA</button>
+      <div class="toast-msg" id="toastCad"></div>
+    </div>
+  </div>
+
+  <!-- ========== LOGIN ========== -->
+  <div id="pageLogin" class="page">
+    <div class="top-bar">
+      <div class="logo">🔑 Login</div>
+      <div class="top-actions">
+        <div class="back-arrow" id="backFromLogin"><span>←</span> Voltar</div>
+      </div>
+    </div>
+    <div class="form-card">
+      <h2>LOGIN</h2>
+      <div class="input-group"><label>EMAIL</label><input type="email" id="loginEmail" placeholder="seu@email.com"></div>
+      <div class="input-group"><label>SENHA</label><input type="password" id="loginSenha" placeholder="********"></div>
+      <button class="btn-primary" id="btnEntrar">ENTRAR</button>
+      <div class="toast-msg" id="toastLogin"></div>
+    </div>
+  </div>
+
+  <!-- ========== PRODUTO (pós login) ========== -->
+  <div id="pageProduto" class="page">
+    <div class="top-bar">
+      <div class="logo">📖 Biblioteca gratuita</div>
+      <div class="top-actions">
+        <div class="back-arrow" id="backFromProduto"><span>←</span> Sair</div>
+      </div>
+    </div>
+    <div style="text-align: center; margin-bottom: 1.2rem; font-weight: 600; font-size: 1rem;">✨ Todos os livros são gratuitos ✨</div>
+    <div class="produto-grid" id="produtosGrid"></div>
+    <div class="toast-msg" id="toastProduto" style="max-width: 300px; margin: 1.5rem auto;"></div>
+  </div>
+
+</div>
+
+<script>
+  (function() {
+    // ----- gerenciamento de páginas -----
+    const pages = {
+      home: document.getElementById('pageHome'),
+      menu: document.getElementById('pageMenu'),
+      cadastro: document.getElementById('pageCadastro'),
+      login: document.getElementById('pageLogin'),
+      produto: document.getElementById('pageProduto')
+    };
+
+    function showPage(name) {
+      Object.keys(pages).forEach(k => pages[k].classList.remove('active'));
+      if (pages[name]) pages[name].classList.add('active');
+    }
+
+    // ----- navegação -----
+    document.getElementById('hamburgerBtn').addEventListener('click', () => showPage('menu'));
+    document.getElementById('backFromMenu').addEventListener('click', () => showPage('home'));
+    document.getElementById('backFromCadastro').addEventListener('click', () => showPage('menu'));
+    document.getElementById('backFromLogin').addEventListener('click', () => showPage('menu'));
+    document.getElementById('backFromProduto').addEventListener('click', () => showPage('home'));
+
+    document.getElementById('menuToLogin').addEventListener('click', () => showPage('login'));
+    document.getElementById('menuToCadastro').addEventListener('click', () => showPage('cadastro'));
+
+    // ----- toast helper -----
+    function showToast(el, msg, isError = false) {
+      if (!el) return;
+      el.innerText = msg;
+      el.style.border = isError ? '1.5px solid #b34e3a' : '1px solid #b8860b';
+      el.style.color = isError ? '#b34e3a' : '#000000';
+      el.classList.add('show');
+      setTimeout(() => el.classList.remove('show'), 2600);
+    }
+
+    // ----- localStorage users -----
+    function getUsers() {
+      try { return JSON.parse(localStorage.getItem('leitores_biblioteca')) || []; } catch { return []; }
+    }
+    function setUsers(arr) { localStorage.setItem('leitores_biblioteca', JSON.stringify(arr)); }
+
+    // seed usuário demo
+    (function seed() {
+      const users = getUsers();
+      if (!users.find(u => u.email === 'demo@livros.com')) {
+        users.push({ id: 1001, nome: 'Leitor(a) Demo', email: 'demo@livros.com', senha: '123' });
+        setUsers(users);
+      }
+    })();
+
+    // ----- cadastro -----
+    document.getElementById('btnCadastrar').addEventListener('click', function() {
+      const nome = document.getElementById('cadNome').value.trim();
+      const email = document.getElementById('cadEmail').value.trim().toLowerCase();
+      const senha = document.getElementById('cadSenha').value;
+      const toast = document.getElementById('toastCad');
+      if (!nome || !email || !senha) return showToast(toast, 'Preencha todos os campos', true);
+      if (!email.includes('@') || !email.includes('.')) return showToast(toast, 'Email inválido', true);
+      if (senha.length < 3) return showToast(toast, 'Senha mínima 3 caracteres', true);
+      const users = getUsers();
+      if (users.find(u => u.email === email)) return showToast(toast, 'Email já cadastrado', true);
+      users.push({ id: Date.now(), nome, email, senha });
+      setUsers(users);
+      showToast(toast, 'Cadastro realizado! Faça login.');
+      document.getElementById('cadNome').value = '';
+      document.getElementById('cadEmail').value = '';
+      document.getElementById('cadSenha').value = '';
+      // preenche login com email
+      document.getElementById('loginEmail').value = email;
+    });
+
+    // ----- login -----
+    document.getElementById('btnEntrar').addEventListener('click', function() {
+      const email = document.getElementById('loginEmail').value.trim().toLowerCase();
+      const senha = document.getElementById('loginSenha').value;
+      const toast = document.getElementById('toastLogin');
+      if (!email || !senha) return showToast(toast, 'Informe email e senha', true);
+      const users = getUsers();
+      const user = users.find(u => u.email === email && u.senha === senha);
+      if (!user) return showToast(toast, 'Email ou senha incorretos', true);
+      showToast(toast, `Bem-vindo(a), ${user.nome}!`);
+      document.getElementById('loginSenha').value = '';
+      // direciona para página produto
+      showPage('produto');
+      // carregar livros (se já não estiver)
+      renderizarProdutos();
+    });
+
+    // ----- produtos (livros) -----
+    const catalogo = [
+      { id: 1, nome: 'Dom Casmurro', autor: 'Machado de Assis', icon: '📘' },
+      { id: 2, nome: 'O Alienista', autor: 'Machado de Assis', icon: '📙' },
+      { id: 3, nome: 'A Hora da Estrela', autor: 'Clarice Lispector', icon: '📖' },
+      { id: 4, nome: 'Vidas Secas', autor: 'Graciliano Ramos', icon: '📕' },
+      { id: 5, nome: 'O Cortiço', autor: 'Aluísio Azevedo', icon: '🏚️' },
+      { id: 6, nome: 'Poemas de Paulo Leminski', autor: 'Paulo Leminski', icon: '✒️' },
+      { id: 7, nome: 'O Príncipe', autor: 'Nicolau Maquiavel', icon: '👑' },
+      { id: 8, nome: 'A Arte da Guerra', autor: 'Sun Tzu', icon: '⚔️' },
+      { id: 9, nome: 'Memórias Póstumas', autor: 'Machado de Assis', icon: '💀' }
+    ];
+
+    function renderizarProdutos() {
+      const container = document.getElementById('produtosGrid');
+      if (!container) return;
+      container.innerHTML = '';
+      catalogo.forEach(livro => {
+        const div = document.createElement('div');
+        div.className = 'produto-item';
+        div.innerHTML = `
+          <div class="icon">${livro.icon}</div>
+          <h4>${livro.nome}</h4>
+          <div class="autor">✍️ ${livro.autor}</div>
+          <div class="gratis">GRÁTIS</div>
+          <button class="btn-produto" data-nome="${livro.nome}" data-autor="${livro.autor}">📥 Baixar / Ler</button>
+        `;
+        container.appendChild(div);
+      });
+      // eventos dos botões
+      document.querySelectorAll('.btn-produto').forEach(btn => {
+        btn.addEventListener('click', function() {
+          const nome = this.getAttribute('data-nome') || 'livro';
+          const autor = this.getAttribute('data-autor') || 'autor';
+          const toast = document.getElementById('toastProduto');
+          showToast(toast, `"${nome}" de ${autor} — download gratuito! ✨`);
+        });
+      });
+    }
+
+    // pré-carregar produtos (para quando acessar)
+    renderizarProdutos();
+
+    // Enter para login e cadastro
+    document.getElementById('cadSenha').addEventListener('keypress', e => { if (e.key === 'Enter') document.getElementById('btnCadastrar').click(); });
+    document.getElementById('loginSenha').addEventListener('keypress', e => { if (e.key === 'Enter') document.getElementById('btnEntrar').click(); });
+
+    // pequeno ajuste: se estiver na home e clicar nas barras, vai pro menu.
+    // já implementado.
+
+    // Para garantir que a página inicial seja a home.
+    showPage('home');
+  })();
+</script>
+</body>
+</html>
